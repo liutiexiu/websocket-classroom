@@ -9,8 +9,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import me.tiezhu.model.Greeting;
+import me.tiezhu.model.MsgGreeting;
 import me.tiezhu.model.HelloMessage;
+import me.tiezhu.model.MsgInClassroom;
+import me.tiezhu.model.MsgTimeSpend;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,10 +58,11 @@ public class GreetingIntegrationTests {
     }
 
     @Test
-    public void getGreeting() throws Exception {
+    public void testClassroom() throws Exception {
         Thread.currentThread().setName("main-test");
 
-        final CountDownLatch latch = new CountDownLatch(2);
+        final long startTime = System.currentTimeMillis();
+        final CountDownLatch latch = new CountDownLatch(5);
         final AtomicReference<Throwable> failure = new AtomicReference<>();
 
         StompSessionHandler handler = new TestSessionHandler(failure) {
@@ -68,58 +71,71 @@ public class GreetingIntegrationTests {
                 Thread.currentThread().setName("client-handler-thread");
             }
 
-
             @Override
             public void afterConnected(final StompSession session, StompHeaders connectedHeaders) {
                 System.out.println("client after connected, headers:" + connectedHeaders);
-                System.out.println("sessionId:" + session.getSessionId());
+                System.out.println(" sessionId:" + session.getSessionId());
 
-                session.subscribe("/user/topic/greetings", new StompFrameHandler() {
+                session.subscribe("/user/personal/msg", new StompFrameHandler() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {
-                        return Greeting.class;
+                        System.out.println("client got headers:" + headers);
+                        if ("MsgTimeSpend".equals(headers.getFirst("type"))) {
+                            latch.countDown();
+                            return MsgTimeSpend.class;
+                        } else {
+                            return MsgGreeting.class;
+                        }
                     }
 
                     @Override
                     public void handleFrame(StompHeaders headers, Object payload) {
-                        Greeting greeting = (Greeting) payload;
-
-                        if (greeting.getContent().startsWith("Pre")) {
-                            System.out.println("client got headers:" + headers);
-                            System.out.println("done");
-                            latch.countDown();
-                            session.disconnect();
-                            return;
-                        }
-
                         try {
-                            assertEquals("Hello, Spring!", greeting.getContent());
-                            System.out.println("client got " + greeting.getContent());
+                            System.out.println("client /personal/msg got " + payload);
                         } catch (Throwable t) {
                             failure.set(t);
-                        } finally {
-                            latch.countDown();
                         }
                     }
                 });
+
+                session.subscribe("/user/classroom/sync", new StompFrameHandler() {
+                    @Override
+                    public Type getPayloadType(StompHeaders headers) {
+                        System.out.println("client got headers:" + headers);
+                        return MsgInClassroom.class;
+                    }
+
+                    @Override
+                    public void handleFrame(StompHeaders headers, Object payload) {
+                        MsgInClassroom msgInClassroom = (MsgInClassroom) payload;
+
+                        try {
+                            System.out.println("client /classroom/sync got " + msgInClassroom);
+                        } catch (Throwable t) {
+                            failure.set(t);
+                        }
+                    }
+                });
+
                 try {
-                    session.send("/app/hello", new HelloMessage("Spring"));
+                    session.send("/app/online", new HelloMessage("Spring"));
                 } catch (Throwable t) {
                     failure.set(t);
-                    latch.countDown();
                 }
             }
         };
 
-        headers.add("wss", "no");
-        this.stompClient.connect("ws://localhost:{port}/websocket", this.headers, handler, this.port);
+        headers.add("X-HTTP-USER", "student4");
+        this.stompClient.connect("ws://localhost:{port}/msg/websocket", this.headers, handler, this.port);
 
-        if (latch.await(10, TimeUnit.SECONDS)) {
+        if (latch.await(60, TimeUnit.SECONDS)) {
             if (failure.get() != null) {
-                throw new AssertionError("", failure.get());
+                throw new AssertionError("failed", failure.get());
+            } else {
+                System.out.println("done in " + (System.currentTimeMillis() - startTime) / 1000 + "s");
             }
         } else {
-            fail("Greeting not received");
+            fail("fail");
         }
 
     }

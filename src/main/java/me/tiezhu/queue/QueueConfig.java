@@ -10,10 +10,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class QueueConfig {
 
-    public static final String Q_NAME_HELLO = "hello";
+    public static final String Q_NAME_CLASSROOM = "classroom";
+    public static final String Q_NAME_USER = "user";
 
     @Bean
-    public Queue helloQueue() {
-        return new Queue(Q_NAME_HELLO);
+    public Queue classroomQueue() {
+        return new Queue(Q_NAME_CLASSROOM);
+    }
+
+    @Bean
+    public Queue userQueue() {
+        return new Queue(Q_NAME_USER);
     }
 }

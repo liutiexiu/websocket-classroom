@@ -1,13 +1,18 @@
 package me.tiezhu.config;
 
 import com.sun.net.httpserver.HttpPrincipal;
+import me.tiezhu.queue.QueueSender;
 import me.tiezhu.websocket.ConnectSecurityInterceptor;
+import me.tiezhu.websocket.Constants.Header;
+import me.tiezhu.websocket.Constants.SubscribePath;
 import me.tiezhu.websocket.WebSocketHandshakeInterceptor;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
-import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.WebSocketHandler;
@@ -15,7 +20,6 @@ import org.springframework.web.socket.config.annotation.AbstractWebSocketMessage
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
-import org.springframework.web.socket.server.HandshakeFailureException;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import java.security.Principal;
@@ -24,9 +28,7 @@ import java.util.Map;
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
-
-    @Autowired
-    private ConnectSecurityInterceptor securityInterceptor;
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketConfig.class);
 
     @Autowired
     private WebSocketHandshakeInterceptor webSocketHandshakeInterceptor;
@@ -37,20 +39,24 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
             @Override
             protected Principal determineUser(
                     ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
-                return new HttpPrincipal("user1", "default");
+                String user = request.getHeaders().getFirst(Header.INPUT_USER);
+                LOGGER.debug("find user {} handshaking {}", user, request.getURI());
+                return new HttpPrincipal(StringUtils.isEmpty(user) ? "no-user" : user, "default");
             }
         };
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/topic");
+        LOGGER.debug("it is {}", registry.getClass());
+        registry.enableSimpleBroker(SubscribePath.PREFIX_PERSONAL, SubscribePath.PREFIX_CLASSROOM, SubscribePath.PREFIX_PUBLIC);
         registry.setApplicationDestinationPrefixes("/app");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/websocket", "/websocket-bad")
+        System.out.println(registry.getClass().getName());
+        registry.addEndpoint("/msg/websocket", "/msg/bad/websocket")
                 .setHandshakeHandler(handshakeHandler())
                 .addInterceptors(webSocketHandshakeInterceptor)
                 .withSockJS();
@@ -58,11 +64,16 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.setInterceptors(securityInterceptor);
+        registration.setInterceptors(channelInterceptor());
     }
 
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
         // TODO set send time limit and message size limit
+    }
+
+    @Bean
+    ConnectSecurityInterceptor channelInterceptor() {
+        return new ConnectSecurityInterceptor();
     }
 }

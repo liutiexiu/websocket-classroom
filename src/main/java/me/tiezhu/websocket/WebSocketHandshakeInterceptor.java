@@ -1,5 +1,7 @@
 package me.tiezhu.websocket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -17,21 +19,19 @@ import java.util.Map;
  */
 @Component
 public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketHandshakeInterceptor.class);
 
     @Override
     public boolean beforeHandshake(
             ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
         ServletServerHttpRequest req = (ServletServerHttpRequest) request;
-        System.out.println(request.getPrincipal());
-        System.out.println(request.getHeaders());
-        System.out.println(attributes);
-        response.getHeaders().add("X-HANDSHAKE", "before");
+        LOGGER.debug("before handshake URI:{}, headers:{}", req.getURI(), req.getHeaders());
         return true;
     }
 
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
-        System.out.println("after handshake");
+        LOGGER.debug("after handshake principal:{}", request.getPrincipal());
         response.getHeaders().add("X-HANDSHAKE", "after");
     }
 }
