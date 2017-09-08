@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration>
+    <appender name="stdout" class="org.apache.log4j.ConsoleAppender">
+        <param name="Target" value="System.out"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%-5p %d{yyyy-MM-dd HH:mm:ss.SSS}] %l (%m)%n"/>
+        </layout>
+    </appender>
+    <appender name="file" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="/home/mmears/log/websocket-classroom/websocket-classroom.log"/>
+        <param name="Append" value="true"/>
+        <param name="DatePattern" value="'.'yyyy-MM-dd"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} [%p] - %c(%F) - %m%n"/>
+        </layout>
+    </appender>
+    <category name="com.mmears" additivity="false">
+        <priority value="debug"/>
+        <appender-ref ref="file"/>
+    </category>
+    <category name="org.apache.http" additivity="false">
+        <priority value="info"/>
+        <appender-ref ref="file"/>
+    </category>
+    <category name="shade.org.apache.commons.httpclient" additivity="false">
+        <priority value="info"/>
+        <appender-ref ref="file"/>
+    </category>
+    <category name="net.paoding.rose" additivity="false">
+        <priority value="info"/>
+        <appender-ref ref="file"/>
+    </category>
+    <category name="net.paoding.rose.web.var.ModelImpl" additivity="false">
+        <priority value="debug"/>
+        <appender-ref ref="file"/>
+    </category>
+    <category name="org.springframework" additivity="false">
+        <priority value="info"/>
+        <appender-ref ref="file"/>
+    </category>
+    <category name="org.springframework.jdbc" additivity="false">
+        <priority value="debug"/>
+        <appender-ref ref="file"/>
+    </category>
+    <category name="sdk.biz.err" additivity="false">
+        <priority value="error"/>
+        <appender-ref ref="stdout"/>
+    </category>
+    
+    <root>
+        <level value="debug"/>
+        <appender-ref ref="file"/>
+    </root>
+</log4j:configuration>
