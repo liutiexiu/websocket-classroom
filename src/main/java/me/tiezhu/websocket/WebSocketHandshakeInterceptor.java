@@ -1,5 +1,9 @@
 package me.tiezhu.websocket;
 
+import com.sun.net.httpserver.HttpPrincipal;
+import me.tiezhu.websocket.Constants.Attribute;
+import me.tiezhu.websocket.Constants.Header;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.server.ServerHttpRequest;
@@ -26,12 +30,19 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
             ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
         ServletServerHttpRequest req = (ServletServerHttpRequest) request;
         LOGGER.debug("before handshake URI:{}, headers:{}", req.getURI(), req.getHeaders());
-        return true;
+
+        String user = request.getHeaders().getFirst(Header.INPUT_USER);
+        if (StringUtils.isNotEmpty(user)) {
+            LOGGER.info("user {} handshaking {}", user, request.getURI());
+            attributes.put(Attribute.PRINCIPAL, new HttpPrincipal(user, "default"));
+        }
+
+        return !req.getURI().toString().contains("/bad/");
     }
 
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
-        LOGGER.debug("after handshake principal:{}", request.getPrincipal());
+        LOGGER.debug("after handshake", exception);
         response.getHeaders().add("X-HANDSHAKE", "after");
     }
 }

@@ -5,7 +5,10 @@ public interface Constants {
     interface Header {
         String INPUT_USER = "X-HTTP-USER";
         String WEBSOCKET_USER = "simpUser";
-        String NATIVE_HEADER = "nativeHeaders";
+    }
+
+    interface Attribute {
+        String PRINCIPAL = "HttpPrincipal";
     }
 
     interface SubscribePath {

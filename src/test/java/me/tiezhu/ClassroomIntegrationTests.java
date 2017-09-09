@@ -19,6 +19,7 @@ import org.junit.runner.RunWith;
 
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
@@ -35,7 +36,7 @@ import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ClassroomIntegrationTests {
 
     @LocalServerPort
@@ -58,11 +59,11 @@ public class ClassroomIntegrationTests {
     }
 
     @Test
-    public void testClassroom() throws Exception {
+    public void testOneStudentClassroom() throws Exception {
         Thread.currentThread().setName("main-test");
 
         final long startTime = System.currentTimeMillis();
-        final CountDownLatch latch = new CountDownLatch(5);
+        final CountDownLatch latch = new CountDownLatch(3);
         final AtomicReference<Throwable> failure = new AtomicReference<>();
 
         StompSessionHandler handler = new TestSessionHandler(failure) {

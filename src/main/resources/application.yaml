@@ -1,11 +1,12 @@
-server.port=9527
+server:
+  port: 9527
 
-spring
-  application
-    name = websocket-classroom
+spring:
+  application:
+    name: websocket-classroom
 
-  rabbitmq
-    host = localhost
-    port = 5672
-    username = guest
-    password = guest
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest

@@ -38,33 +38,8 @@ public class MainController {
     @GetMapping("/roles")
     @ResponseBody
     public String getRoles() {
-        return "@json:" + new JSONObject().put("students", Arrays.asList(students))
-                                          .put("teachers", Arrays.asList(teachers));
-    }
-
-    // to /app/hello
-    @MessageMapping("/hello")
-    @SendToUser(value = "/personal/greetings", broadcast = false)
-    // @SendTo("/topic/greetings")
-    public MsgGreeting greeting(HelloMessage message, @Header("simpSessionId") String sessionId, final Principal principal) throws Exception {
-        System.out.println("simpSessionId=" + sessionId);
-        System.out.println("principal=" + principal);
-        queueSender.sendToClassroomQueue(new JSONObject().put("msg", "lalala"));
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.currentThread().setName("push thread");
-                    Thread.sleep(3500);
-                    template.convertAndSendToUser(principal.getName(), "/topic/greetings", new MsgGreeting("Pre Hello"));
-                    // template.convertAndSend("/topic/greetings", new MsgGreeting("Pre Hello"));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-        Thread.sleep(1000); // simulated delay
-        return new MsgGreeting("Hello, " + message.getName() + "!");
+        return new JSONObject().put("students", Arrays.asList(students))
+                               .put("teachers", Arrays.asList(teachers)).toString();
     }
 
     // to /app/online

@@ -3,6 +3,7 @@ package me.tiezhu.config;
 import com.sun.net.httpserver.HttpPrincipal;
 import me.tiezhu.queue.QueueSender;
 import me.tiezhu.websocket.ConnectSecurityInterceptor;
+import me.tiezhu.websocket.Constants.Attribute;
 import me.tiezhu.websocket.Constants.Header;
 import me.tiezhu.websocket.Constants.SubscribePath;
 import me.tiezhu.websocket.WebSocketHandshakeInterceptor;
@@ -39,9 +40,13 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
             @Override
             protected Principal determineUser(
                     ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
-                String user = request.getHeaders().getFirst(Header.INPUT_USER);
-                LOGGER.debug("find user {} handshaking {}", user, request.getURI());
-                return new HttpPrincipal(StringUtils.isEmpty(user) ? "no-user" : user, "default");
+                LOGGER.debug("handshake attributes:{}", attributes);
+                Object user = attributes.get(Attribute.PRINCIPAL);
+                if (user == null) {
+                    return new HttpPrincipal("no-user", "default");
+                } else {
+                    return (Principal) user;
+                }
             }
         };
     }
@@ -55,7 +60,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        System.out.println(registry.getClass().getName());
+        LOGGER.debug("StompEndpointRegistry:{}", registry.getClass().getName());
         registry.addEndpoint("/msg/websocket", "/msg/bad/websocket")
                 .setHandshakeHandler(handshakeHandler())
                 .addInterceptors(webSocketHandshakeInterceptor)
