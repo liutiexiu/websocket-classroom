@@ -1,7 +1,9 @@
 package me.tiezhu.queue;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import me.tiezhu.model.MsgInClassroom;
 import me.tiezhu.model.MsgTimeSpend;
+import me.tiezhu.model.QueueMsgInClassroom;
 import me.tiezhu.utils.Utils;
 import me.tiezhu.websocket.Constants.SubscribePath;
 import org.json.JSONObject;
@@ -14,6 +16,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.Collections;
 
 import static me.tiezhu.queue.QueueConfig.Q_NAME_CLASSROOM;
@@ -30,11 +33,13 @@ public class QueueReceiver {
     @Autowired
     private SimpMessagingTemplate template;
 
+    private static ObjectMapper mapper = new ObjectMapper();
+
     @RabbitHandler
     @RabbitListener(queues = Q_NAME_CLASSROOM)
-    public void consumeClassroomMessage(String msg) {
+    public void consumeClassroomMessage(QueueMsgInClassroom msg) throws IOException {
         LOGGER.debug("msg from classroom queue, msg:{}", msg);
-        String user = new JSONObject(msg).optString("user");
+        String user = msg.getUser();
         String classroom = Utils.findUserClassroom(user);
         template.convertAndSendToUser(classroom, SubscribePath.CLASSROOM_INFO, new MsgInClassroom(user, classroom, System.currentTimeMillis()));
     }

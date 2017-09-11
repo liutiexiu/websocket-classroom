@@ -2,6 +2,7 @@ package me.tiezhu.websocket;
 
 import me.tiezhu.model.MsgGreeting;
 import me.tiezhu.model.HelloMessage;
+import me.tiezhu.model.QueueMsgInClassroom;
 import me.tiezhu.queue.QueueReceiver;
 import me.tiezhu.queue.QueueSender;
 import me.tiezhu.utils.Utils;
@@ -47,9 +48,10 @@ public class MainController {
     @SendToUser(value = SubscribePath.PERSONAL_MSG)
     public MsgGreeting userOnline(HelloMessage message, @Header("simpSessionId") String sessionId, final Principal principal) throws Exception {
         // send to class queue, to notify teacher and all classmates
-        queueSender.sendToClassroomQueue(new JSONObject().put("user", principal.getName())
-                                                         .put("sessionId", sessionId)
-                                                         .put("msg.name", message.getName()));
+//        queueSender.sendToClassroomQueue(new JSONObject().put("user", principal.getName())
+//                                                         .put("sessionId", sessionId)
+//                                                         .put("msg.name", message.getName()));
+        queueSender.sendToClassroomQueue(new QueueMsgInClassroom(principal.getName(), sessionId, message.getName(), System.currentTimeMillis()));
         return new MsgGreeting("Hello " + principal.getName() + ", welcome to " + Utils.findUserClassroom(principal.getName()));
     }
 }
