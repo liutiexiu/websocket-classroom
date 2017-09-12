@@ -7,6 +7,10 @@ public interface Constants {
         String WEBSOCKET_USER = "simpUser";
     }
 
+    interface Param {
+        String USER = "user";
+    }
+
     interface Attribute {
         String PRINCIPAL = "HttpPrincipal";
     }

@@ -126,10 +126,10 @@ public class ClassroomIntegrationTests {
             }
         };
 
-        headers.add("X-HTTP-USER", "student4");
-        this.stompClient.connect("ws://localhost:{port}/msg/websocket", this.headers, handler, this.port);
+        // headers.add("X-HTTP-USER", "student4");
+        this.stompClient.connect("ws://localhost:{port}/msg/websocket?user=student4", this.headers, handler, this.port);
 
-        if (latch.await(120, TimeUnit.SECONDS)) {
+        if (latch.await(40, TimeUnit.SECONDS)) {
             if (failure.get() != null) {
                 throw new AssertionError("failed", failure.get());
             } else {
