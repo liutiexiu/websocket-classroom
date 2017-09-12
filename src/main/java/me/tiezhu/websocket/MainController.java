@@ -9,6 +9,7 @@ import me.tiezhu.utils.Utils;
 import me.tiezhu.websocket.Constants.SubscribePath;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -16,6 +17,7 @@ import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.security.Principal;
 import java.util.Arrays;
@@ -36,7 +38,7 @@ public class MainController {
     public static final String[] teachers = new String[]{"teacher1", "teacher2"};
     public static final String[] students = new String[]{"student1", "student2", "student3", "student4"};
 
-    @GetMapping("/roles")
+    @GetMapping(value = "/roles", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String getRoles() {
         return new JSONObject().put("students", Arrays.asList(students))

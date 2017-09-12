@@ -1,10 +1,7 @@
 package me.tiezhu.http;
 
-import me.tiezhu.websocket.WebSocketHandshakeInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
  *
  * 为了测试passport能不能接入
  */
-@Component
 public class PassportInterceptor extends HandlerInterceptorAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(PassportInterceptor.class);
 
