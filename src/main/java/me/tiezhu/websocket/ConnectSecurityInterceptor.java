@@ -39,7 +39,7 @@ public class ConnectSecurityInterceptor extends ChannelInterceptorAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectSecurityInterceptor.class);
 
-    public static final long NOTIFY_INTERVAL = TimeUnit.SECONDS.toSeconds(5);
+    public static final long NOTIFY_INTERVAL = TimeUnit.SECONDS.toSeconds(10);
 
     private ScheduledExecutorService timeExecutor = Executors.newScheduledThreadPool(4);
 

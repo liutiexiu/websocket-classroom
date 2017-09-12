@@ -63,7 +63,7 @@ public class ClassroomIntegrationTests {
         Thread.currentThread().setName("main-test");
 
         final long startTime = System.currentTimeMillis();
-        final CountDownLatch latch = new CountDownLatch(3);
+        final CountDownLatch latch = new CountDownLatch(2);
         final AtomicReference<Throwable> failure = new AtomicReference<>();
 
         StompSessionHandler handler = new TestSessionHandler(failure) {
@@ -129,7 +129,7 @@ public class ClassroomIntegrationTests {
         headers.add("X-HTTP-USER", "student4");
         this.stompClient.connect("ws://localhost:{port}/msg/websocket", this.headers, handler, this.port);
 
-        if (latch.await(60, TimeUnit.SECONDS)) {
+        if (latch.await(120, TimeUnit.SECONDS)) {
             if (failure.get() != null) {
                 throw new AssertionError("failed", failure.get());
             } else {

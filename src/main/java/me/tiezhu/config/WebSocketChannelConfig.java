@@ -22,6 +22,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
+import org.springframework.web.socket.handler.WebSocketHandlerDecoratorFactory;
 import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
@@ -82,6 +83,12 @@ public class WebSocketChannelConfig extends AbstractWebSocketMessageBrokerConfig
 
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
+        registration.addDecoratorFactory(new WebSocketHandlerDecoratorFactory() {
+            @Override
+            public WebSocketHandler decorate(WebSocketHandler handler) {
+                return new MyWebSocketHandler(handler);
+            }
+        });
         // TODO set send time limit and message size limit
     }
 
