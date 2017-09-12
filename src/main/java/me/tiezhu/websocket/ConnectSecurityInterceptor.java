@@ -46,7 +46,7 @@ public class ConnectSecurityInterceptor extends ChannelInterceptorAdapter {
     private Map<String, Pair<Long, ScheduledFuture<?>>> userMap = new TreeMap<>();
 
     @Autowired
-    QueueSender queueSender;
+    private QueueSender queueSender;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {

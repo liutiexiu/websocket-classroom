@@ -1,18 +1,23 @@
 package me.tiezhu.websocket;
 
-import org.springframework.stereotype.Component;
-import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.WebSocketHandlerDecorator;
-import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
+import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
 /**
  * Created by liushuai on 2017/9/7.
  *
- * 注册自己的WebSocketHandler会返回400
- * TODO 如果能自己注册，就可以处理连接问题了
+ * 这个handler似乎没有生效
  */
 @Deprecated
-// @Component
-public class MyWebSocketHandler {
+public class MyWebSocketHandler extends AbstractWebSocketHandler {
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        System.out.println("here," + session);
+    }
+
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        System.out.println("or here," + status);
+    }
 }

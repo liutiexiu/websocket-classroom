@@ -11,6 +11,7 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.handler.WebSocketHandlerDecorator;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import java.util.Map;
@@ -30,6 +31,7 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
             ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
         ServletServerHttpRequest req = (ServletServerHttpRequest) request;
         LOGGER.debug("before handshake URI:{}, headers:{}", req.getURI(), req.getHeaders());
+        System.out.println("oh, " + ((WebSocketHandlerDecorator)wsHandler).getDelegate().getClass());
 
         String user = request.getHeaders().getFirst(Header.INPUT_USER);
         if (StringUtils.isNotEmpty(user)) {
